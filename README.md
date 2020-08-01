@@ -34,7 +34,13 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
  # general process flow
  the tables are moved to the recyclebin and then deleted separately. The idea is that in case we want to restore the data we should be able to.
  
+ when we are archiving a file then the entire lifecycles are first determined, and then we determine the order of these lifecycles. 
+ 
+ Based on the order of the creation of these lifecycles, we determine the order in which the table will be archived. All the rules for determining the   
+ 
 # details 
+* the entire solution is being viewed as a DAG, in case there are cycling dependencies, things will cause severe inconsistencies and issues
+* we should be able to validate after every run, whether separately running a program, or a new program whether the archival for a table has been done successfully or not
 * when we are archiving the files then we should have idempotency
 * the operations should be stateless 
 * we should be able to restore the data 
@@ -44,7 +50,48 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
 * the ideal method should be to run something like sync instead of copy, so that the metadata of the files (like date of creation) is already maintained in the recycle bin
 * when we are restoring the data we should have the option of specifying the particular lifecycle that we want to restore. Generally restoring the entire lifecycle may be a bad idea, we should also be able to say which particular location to restore to
 * while restoring the storage class cannot change into incompatible types, for example we cannot restore data archived from S3 to Postgres database but we should be able to restore the data from S3 to S3  
-* 
+* two different lifecycles cannot point to the same storage class, and location. For example, for table1 the lifecycle_raw and lifecycle_bronze cannot point to the database.user.table which are same. Or HDFS location which is the same
+* if the storage is mentioned as glue, then we should:
+    1. determine the storage location based on the partition determined by the date
+    2. then the physical location of the table
+    3. then create the table in SPARK for it, and then determine the partitions again
+   
+   This is because we can drop the partition first, and then while deleting the files we might fail midway, therefore next time around the only way to identify the partition would be to read the table definition from glue and then recreate a temporary table in SPARK which will load all the physical partitions.
+* if the storage is just file location, and not delta then the date is basically the date of the file creation
+* the storage is delta, then we obviously we need to:
+    1. ensure that VACCUM has run to cover that date so that we do not have multiple files for that date
+    2. sync the files to recycle bin
+    3. then run the delete command in delta (which ever is the suitable command)
+
+
+
+# how do we update the table.json file
+firstly how do we what is the best option? 
+    * Do we have a single json file with the name of all the tables in it, or 
+    * do we have a single json file with different table names in it as dictionary?
+
+currently we are choosing that there will be separate json files for each table. It looks bad and is not a great structure, but we can decide this later, in any case the changes required in the code for this kind of structure change will be minimum.
+
+
+__table.json__
+```json
+"tablname": {
+    "lifecycle_name_1": { "order" : 1},
+    "lifecycle_name_2": {"order" : 2},
+    "lifecycle_name_3": {"order" : 2},
+}
+```
+* _note_ : we can have two lifecycles which are in the same level of order, think of this as a DAG 
+    
+
+looking at  the _lifecycle_ details
+```json
+"tablname" : {
+    "lifecycle_name_1": { "order" : 1,
+                          "storage": "glue"
+                          "glue"},
+}
+```
 
 # code features 
 * auto documentation
