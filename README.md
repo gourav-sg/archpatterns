@@ -1,3 +1,6 @@
+# disclaimer
+personal exercise, please feel free to indulge in confusion, chaos, and pure kicks in case you are using this.
+
 # archpatterns
 notes and practices from the book "Architecture Patterns with Python"
 
