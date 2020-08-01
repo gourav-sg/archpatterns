@@ -40,7 +40,10 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
  
 # details 
 * the entire solution is being viewed as a DAG, in case there are cycling dependencies, things will cause severe inconsistencies and issues
+* deletion dates are only determined either based on file creation date or partition date, if the deletion refers to column which is not the one based on which the table is partitioned, then the table has to be in delta or in database
+* sub-partitions and their deletions is not covered initially 
 * we should be able to validate after every run, whether separately running a program, or a new program whether the archival for a table has been done successfully or not
+* removing lifecycle rules are not allowed, as they will help us understand the archival over several different years, archival rules which are not valid should have an end date based on the date when the data they point to stopped getting populated
 * when we are archiving the files then we should have idempotency
 * the operations should be stateless 
 * we should be able to restore the data 
@@ -52,6 +55,7 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
 * while restoring the storage class cannot change into incompatible types, for example we cannot restore data archived from S3 to Postgres database but we should be able to restore the data from S3 to S3  
 * two different lifecycles cannot point to the same storage class, and location. For example, for table1 the lifecycle_raw and lifecycle_bronze cannot point to the database.user.table which are same. Or HDFS location which is the same
 * if the storage is mentioned as glue, then we should:
+    1. determine hte partition name from the description of the table 
     1. determine the storage location based on the partition determined by the date
     2. then the physical location of the table
     3. then create the table in SPARK for it, and then determine the partitions again
@@ -62,6 +66,8 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
     1. ensure that VACCUM has run to cover that date so that we do not have multiple files for that date
     2. sync the files to recycle bin
     3. then run the delete command in delta (which ever is the suitable command)
+    4. in case we are creating athena / hive table metadata from delta that should also be updated accordingly
+    5. all delta tables must have corresponding tables defined in Athena, in case they are not, then the location should be that of S3/ GCS/ HDFS
 
 
 
@@ -84,15 +90,56 @@ __table.json__
 * _note_ : we can have two lifecycles which are in the same level of order, think of this as a DAG 
     
 
-looking at  the _lifecycle_ details
+looking at  the _lifecycle_ details for a table
 ```json
+{
 "tablname" : {
-    "lifecycle_name_1": { "order" : 1,
-                          "storage": "glue"
-                          "glue"},
+  "lifecycle_name_2" : {
+                        "order" : 2,
+                        "lifecycle_storage_name_2": { 
+                                                      "storage": "delta",
+                                                      "archival_type" : "table",
+                                                      "archival_object_detail" : { "table_name": "table_name_in_glue"},
+                                                      "starting_storage_date" : "01-Jan-2019",
+                                                      "ending_storage_date" : "" or "21-Feb-2020"
+                                                    },
+                        "lifecycle_storage_name_1": { 
+                                                      "storage": "glue",
+                                                      "archival_object_type" : "table",
+                                                      "archival_object_detail" : {"table_name": "table_name_in_glue" },
+                                                      "starting_storage_date" : "01-Jan-2019",
+                                                      "ending_storage_date" : "" or "21-Feb-2020"
+                                                    },
+  },
+  "lifecycle_name_1" : {
+                        "order" : 1,
+                        "lifecycle_storage_name_1": { 
+                                                      "storage": "s3",
+                                                      "archival_object_type" : "file",
+                                                      "archival_object_detail" : {
+                                                                                    "bucket_name": "bucket_name",
+                                                                                    "key_name": "keyname/table_file_name*.gz"
+                                                                                  },
+                                                      "starting_storage_date" : "01-Jan-2019",
+                                                      "ending_storage_date" : "" or "21-Feb-2020"
+                                                    },
+  },
+
+    "data_archive_before_period" : "month",
+    "data_archive_before" : 2,
+    "target_location_bucket" : "archive_bucket", 
+    "target_location_key" : "/basepath/{tablename}/{lifecycle_name}/{lifecycle_storage_name}/{partition}/"
+
+}
 }
 ```
+
+the json structure for the main program should include the following:
+1. the location of storing all the logs of runs (*run files*)- these are not the logs of the run, but the logs of the actual runs that should happen. In case we are doing a dry run then only these files should be created, and nothing more, in actual runs the details from these files will be taken in and then executed in the physical layer. So this is generally the files which are used for handing over the actual archival payload. we should be able to use the logs of the run above and then compare the current system to understand how much of a run has been successful
+
 
 # code features 
 * auto documentation
 * PEP 8 
+* dry run 
+* force run, to override the run files
