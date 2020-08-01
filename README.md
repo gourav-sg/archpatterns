@@ -67,9 +67,53 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
     3. then run the delete command in delta (which ever is the suitable command)
     4. in case we are creating athena / hive table metadata from delta that should also be updated accordingly
     5. all delta tables must have corresponding tables defined in Athena, in case they are not, then the location should be that of S3/ GCS/ HDFS
-* we should have run logs, which are basically like the payload generated before starting the actual physical implementation, this is something akin to what the domain layer should generate 
+* we should have run logs, which are basically like the payload generated before starting the actual physical implementation, this is something akin to what the domain layer should generate
+* the scenario where the same table archival is tried at exactly the same point in the time is not covered, but in case we have a run file already created in a matter of one hour, then the archival picks up the earlier run file. Otherwise if we have the `--force-run` flag then the existing run file in last one hour is ignored. 
 
 
+# how do we structure the run files
+* the name of the run files are like "{system}_archival_{tablename}_{YYYYMMDDHH}_run_file.json"
+* the contents should have a form like this:
+
+```json
+
+{
+  "table_name" : "tablename",
+  "archival_date_time" : "01-Jan-2020 10:10:10",
+  "archival_details": 
+  [
+    { 
+      "lifecycle_name" : "lifecycle_name_1",
+      "storage": "delta",
+      "archival_type" : "table",
+      "archival_object_detail" : { "table_name": "table_name_in_glue"},
+      "starting_storage_date" : "01-Jan-2019",
+      "ending_storage_date" : "",
+      "commands" :[
+                    { "seq" : 1,
+                      "system" : "delta",
+                      "command" : "DROP PARTITION ...."
+                    },
+                    {
+                      "seq" : 2,
+                      "system" : "aws",
+                      "command" : "aws s3 sync ...."
+                    },
+                    {
+                      "seq" : 2,
+                      "system" : "aws",
+                      "command" : "aws s3 sync ...."                    
+                    },
+                    {
+                      "seq" : 3,
+                      "system" : "aws",
+                      "command" : "aws s3 rm  ...."                    
+                    },
+                  ]   
+    } 
+  ] 
+}
+```
 
 
 # how do we update the table.json file
@@ -144,5 +188,5 @@ the json structure for the main program should include the following:
 # code features 
 * auto documentation
 * PEP 8 
-* dry run 
-* force run - to override the run files 
+* dry-run - to generate the run files 
+* force-run - to override the run files 
