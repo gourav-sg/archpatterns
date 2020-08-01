@@ -101,14 +101,14 @@ looking at  the _lifecycle_ details for a table
                                                       "archival_type" : "table",
                                                       "archival_object_detail" : { "table_name": "table_name_in_glue"},
                                                       "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : "" or "21-Feb-2020"
+                                                      "ending_storage_date" : ""
                                                     },
                         "lifecycle_storage_name_1": { 
                                                       "storage": "glue",
                                                       "archival_object_type" : "table",
                                                       "archival_object_detail" : {"table_name": "table_name_in_glue" },
                                                       "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : "" or "21-Feb-2020"
+                                                      "ending_storage_date" : "21-Feb-2020"
                                                     },
   },
   "lifecycle_name_1" : {
