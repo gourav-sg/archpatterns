@@ -81,10 +81,12 @@ currently we are choosing that there will be separate json files for each table.
 
 __table.json__
 ```json
+{
 "tablname": {
     "lifecycle_name_1": { "order" : 1},
     "lifecycle_name_2": {"order" : 2},
-    "lifecycle_name_3": {"order" : 2},
+    "lifecycle_name_3": {"order" : 2}
+}
 }
 ```
 * _note_ : we can have two lifecycles which are in the same level of order, think of this as a DAG 
@@ -109,7 +111,7 @@ looking at  the _lifecycle_ details for a table
                                                       "archival_object_detail" : {"table_name": "table_name_in_glue" },
                                                       "starting_storage_date" : "01-Jan-2019",
                                                       "ending_storage_date" : "21-Feb-2020"
-                                                    },
+                                                    }
   },
   "lifecycle_name_1" : {
                         "order" : 1,
@@ -121,8 +123,8 @@ looking at  the _lifecycle_ details for a table
                                                                                     "key_name": "keyname/table_file_name*.gz"
                                                                                   },
                                                       "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : "" or "21-Feb-2020"
-                                                    },
+                                                      "ending_storage_date" : "21-Feb-2020"
+                                                    }
   },
 
     "data_archive_before_period" : "month",
