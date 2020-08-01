@@ -47,6 +47,7 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
 * the operations should be stateless 
 * we should be able to restore the data 
 * we are not expecting that the archiving data is susceptible to changes. In case that happens then we are archving active records and restorations of records may make the system unstable
+* parallelizm is possible at table level, therefore two tables can be parallelized together, but parallelization of the table table across different lifecycles, and lifecycle storages is not being implemented
 * when we are archiving a table which has entry in the metadata stores like HIVE metastores, etc, then this means we have to ensure that we remove the partition before deleting the data, otherwise if there is a partial delete then that partition will show partial data
 * when we are archiving data we should not use move command for files, this is because in case the move command suddenly fails then the target location and the source location with both represent inconsistent states of the data 
 * the ideal method should be to run something like sync instead of copy, so that the metadata of the files (like date of creation) is already maintained in the recycle bin
