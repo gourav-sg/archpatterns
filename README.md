@@ -108,7 +108,7 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
                       "seq" : 3,
                       "system" : "aws",
                       "command" : "aws s3 rm  ...."                    
-                    },
+                    }
                   ]   
     } 
   ] 
