@@ -32,11 +32,10 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
     we can see that the last two stages are both in AWS and all the new data exists in S3 where as the old data for the table exists in HDFS. This is ofcourse overloaded, and things might be simpler in real time
  
  # general process flow
- the tables are moved to the recyclebin and then deleted separately. The idea is that in case we want to restore the data we should be able to.
- 
- when we are archiving a file then the entire lifecycles are first determined, and then we determine the order of these lifecycles. 
- 
- Based on the order of the creation of these lifecycles, we determine the order in which the table will be archived. All the rules for determining the   
+* the tables are moved to the recyclebin and then deleted separately. The idea is that in case we want to restore the data we should be able to.
+* when we are archiving a file then the entire lifecycles are first determined, and then we determine the order of these lifecycles. 
+* Based on the order of the creation of these lifecycles, we determine the order in which the table will be archived. if there are two lifecycles in the same order or in case a life cycle has multiple storages then we can delete them in any order we want 
+* We should be able to restart from a failed archival in case required, in any case the archival rules are written in such a way that they first calculate the entire list of artefacts to be archived every single time     
  
 # details 
 * the entire solution is being viewed as a DAG, in case there are cycling dependencies, things will cause severe inconsistencies and issues
@@ -68,6 +67,8 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
     3. then run the delete command in delta (which ever is the suitable command)
     4. in case we are creating athena / hive table metadata from delta that should also be updated accordingly
     5. all delta tables must have corresponding tables defined in Athena, in case they are not, then the location should be that of S3/ GCS/ HDFS
+* we should have run logs, which are basically like the payload generated before starting the actual physical implementation, this is something akin to what the domain layer should generate 
+
 
 
 
@@ -144,4 +145,4 @@ the json structure for the main program should include the following:
 * auto documentation
 * PEP 8 
 * dry run 
-* force run, to override the run files
+* force run - to override the run files 
