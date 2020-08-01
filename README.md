@@ -91,24 +91,44 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
       "starting_storage_date" : "01-Jan-2019",
       "ending_storage_date" : "",
       "commands" :[
+                    { "seq" : 0,
+                      "system" : "s3",
+                      "command" : "aws s3 sync ...",
+                      "command_about" : "backup_data"  
+                    },
+                    { "seq" : 0,
+                      "system" : "s3",
+                      "command" : "aws s3 sync ...",
+                      "command_about" : "backup_metadata_of_streaming_or_delta"  
+                    },
                     { "seq" : 1,
-                      "system" : "delta",
-                      "command" : "DROP PARTITION ...."
+                      "system" : "glue",
+                      "command" : "DROP PARTITION ....",
+                      "command_about" : "drop_table_partition"
                     },
                     {
                       "seq" : 2,
                       "system" : "aws",
-                      "command" : "aws s3 sync ...."
-                    },
-                    {
-                      "seq" : 2,
-                      "system" : "aws",
-                      "command" : "aws s3 sync ...."                    
+                      "command" : "aws s3 sync ....",
+                      "command_about" : "sync_source_to_archive"
                     },
                     {
                       "seq" : 3,
-                      "system" : "aws",
-                      "command" : "aws s3 rm  ...."                    
+                      "system" : "delta",
+                      "command" : "DELETE FROM ....",
+                      "command_about" : "delete_delta_data"                    
+                    },
+                    {
+                      "seq" : 4,
+                      "system" : "delta",
+                      "command" : "DROP PARTITION ....",
+                      "command_about" : "drop_glue_partition"                    
+                    },
+                    {
+                      "seq" : 5,
+                      "system" : "delta",
+                      "command" : "GENERATE symlink_format_manifest ....",
+                      "command_about" : "update_athena_symlink"                    
                     }
                   ]   
     } 
@@ -184,7 +204,7 @@ looking at  the _lifecycle_ details for a table
 
 the json structure for the main program should include the following:
 1. the location of storing all the logs of runs (*run files*)- these are not the logs of the run, but the logs of the actual runs that should happen. In case we are doing a dry run then only these files should be created, and nothing more, in actual runs the details from these files will be taken in and then executed in the physical layer. So this is generally the files which are used for handing over the actual archival payload. we should be able to use the logs of the run above and then compare the current system to understand how much of a run has been successful
-
+2. it should include backup location in case required, so that we are backing up before starting the archival 
 
 # code features 
 * auto documentation
