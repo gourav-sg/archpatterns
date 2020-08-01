@@ -135,6 +135,7 @@ a table has many lifecycles, and a lifecycle can have multiple storage classes. 
   ] 
 }
 ```
+* __note__: the order in which we are carrying out the operations, it is very important to note that we cannot drop the partition after deleting the data, because in case the deletion is partial and the partition is not dropped, then the data will appear inconsistent. Therefore order of operations is important, we do not need to make things atomic, but the order has to be maintained so that inconsistent query results can be avoided.
 
 
 # how do we update the table.json file
