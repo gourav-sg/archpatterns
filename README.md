@@ -215,4 +215,6 @@ the json structure for the main program should include the following:
 
 # reference
 * __documentation__ : https://spark.apache.org/docs/latest/api/python/pyspark.ml.html#module-pyspark.ml.linalg
-
+
+# pyCharm set up 
+* for tests to work in PyCharm, used the details mentioned [here](https://www.jetbrains.com/help/pycharm/pytest.html#enable-pytest)  

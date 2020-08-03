@@ -7,6 +7,7 @@ from typing import Optional, List, Set
 class OutOfStock(Exception):
     pass
 
+
 def allocate(line: OrderLine, batches: List[Batch]) -> str:
     try:
         batch = next(
@@ -16,6 +17,7 @@ def allocate(line: OrderLine, batches: List[Batch]) -> str:
         return batch.reference
     except StopIteration:
         raise OutOfStock(f'Out of stock for sku {line.sku}')
+
 
 @dataclass(frozen=True)
 class OrderLine:
