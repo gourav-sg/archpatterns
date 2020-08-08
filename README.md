@@ -162,44 +162,58 @@ __table.json__
 looking at  the _lifecycle_ details for a table
 ```json
 {
-"tablname" : {
-  "lifecycle_name_2" : {
-                        "order" : 2,
-                        "lifecycle_storage_name_2": { 
-                                                      "storage": "delta",
-                                                      "archival_type" : "table",
-                                                      "archival_object_detail" : { "table_name": "table_name_in_glue"},
-                                                      "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : ""
-                                                    },
-                        "lifecycle_storage_name_1": { 
-                                                      "storage": "glue",
-                                                      "archival_object_type" : "table",
-                                                      "archival_object_detail" : {"table_name": "table_name_in_glue" },
-                                                      "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : "21-Feb-2020"
-                                                    }
-  },
-  "lifecycle_name_1" : {
-                        "order" : 1,
-                        "lifecycle_storage_name_1": { 
-                                                      "storage": "s3",
-                                                      "archival_object_type" : "file",
-                                                      "archival_object_detail" : {
-                                                                                    "bucket_name": "bucket_name",
-                                                                                    "key_name": "keyname/table_file_name*.gz"
-                                                                                  },
-                                                      "starting_storage_date" : "01-Jan-2019",
-                                                      "ending_storage_date" : "21-Feb-2020"
-                                                    }
-  },
+  "table_name" : "table1",
+  "lifecycles" : [{
+                  "lifecycle_name" : "lifecycle_name_2",
+                  "lifecycle_order" : 2, 
+                  "lifecycle_storages" : [
+                                          {  
+                                            "lifecycle_storage_name" : "lifecycle_storage_name_2",
+                                            "lifecycle_storage_details": { 
+                                                                          "storage": "delta",
+                                                                          "archival_type" : "table",
+                                                                          "archival_object_detail" : { "table_name": "table_name_in_glue"},
+                                                                          "starting_storage_date" : "01-Jan-2019",
+                                                                          "ending_storage_date" : ""
+                                                                        }
+                                          },
+                                          {
+                                            "lifecycle_storage_name" : "lifecycle_storage_name_1",
+                                            "lifecycle_storage_details": { 
+                                                                      "storage": "glue",
+                                                                      "archival_object_type" : "table",
+                                                                      "archival_object_detail" : {"table_name": "table_name_in_glue" },
+                                                                      "starting_storage_date" : "01-Jan-2019",
+                                                                      "ending_storage_date" : "21-Feb-2020"
+                                                                    }
+                                          }
+                                        ]
+                  },
 
+                  {
+                  "lifecycle_name" : "lifecycle_name_1",
+                  "lifecycle_order" : 1, 
+                  "lifecycle_storages" : [
+                                          {  
+                                            "lifecycle_storage_name" : "lifecycle_storage_name_2",
+                                            "lifecycle_storage_details": { 
+                                                                          "storage": "s3",
+                                                                          "archival_object_type" : "file",
+                                                                          "archival_object_detail" : {
+                                                                                                        "bucket_name": "bucket_name",
+                                                                                                        "key_name": "keyname/table_file_name*.gz"
+                                                                                                      },
+                                                                          "starting_storage_date" : "01-Jan-2019",
+                                                                          "ending_storage_date" : "21-Feb-2020"
+                                                                        }
+                                          }
+                                        ]
+                  }
+                ],
     "data_archive_before_period" : "month",
     "data_archive_before" : 2,
     "target_location_bucket" : "archive_bucket", 
     "target_location_key" : "/basepath/{tablename}/{lifecycle_name}/{lifecycle_storage_name}/{partition}/"
-
-}
 }
 ```
 
