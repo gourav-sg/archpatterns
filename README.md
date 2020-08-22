@@ -227,6 +227,9 @@ the json structure for the main program should include the following:
 * dry-run - to generate the run files 
 * force-run - to override the run files 
 
+# creating the environment 
+* trying to create a _databricks_ cluster and seeing whether we can make a JDBC connection to it 
+
 # reference
 * __documentation__ : https://spark.apache.org/docs/latest/api/python/pyspark.ml.html#module-pyspark.ml.linalg
 
