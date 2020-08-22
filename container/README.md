@@ -44,13 +44,16 @@ we are trying to use EC2 images so that we can start working on getting these im
 * entering the option `--rm` at the end does not work `docker run -v /tmp:/tmp amazonlinux /bin/bash -c "ls -las > /tmp/testoutput.txt" --rm`
 
 ## DOCKER BASICS: PORT FORWARDING
-* `docker run -d httpd`
+* `docker run -d -p 8080:80 httpd`
     * __-d__ running in detached mode
     * __-p__ port binding `<<port in host>>`:`<<port in container>>`
         
 * `docker logs <<container_name>> -f`
     * __-f__ shows the running logs of the container
 * `docker inspect <<container name>>`, this shows the container configurations, and we can see the settings like `portbindings` or `ipaddress` and so on
+
+## DOCKER BASICS: DOCKER FILES
+
 
 # LEARNING PATH
 * docker, dockerfile, docker compose: https://learning.oreilly.com/videos/docker-dockerfile-and/9781800206847
