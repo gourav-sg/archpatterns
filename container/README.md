@@ -25,7 +25,7 @@ we are trying to use EC2 images so that we can start working on getting these im
     * _container_: `echo "export JAVA_HOME=\"/mnt/neo4j/java_11\"" >> ~/.bash_profile ; source ~/.bash_profile`
 1. came out of container, since all the dependencies are installed in the mounted area, therefore its not an issue
 1. start the container: `docker start neo4j`
-1. login to the container: `docker exec -it neo4j /bin/bash`
+1. login to the container: `docker exec -it neo4j /bin/bash` or `docker attach neo4j`
 1. stop the container after coming out of it: `docker stop neo4j`
 1. we now need to create a new container with the ports mapped, note that as of now we cannot start a container whose ports were not mapped, and map new ports to them, or maybe I do not know about it
 1. remove the local container: `docker run -it  --name neo4j --mount type=bind,source=$(cd ~; pwd)/Development/neo4j,target=/mnt/neo4j -p7474:7474 -p7687:7687 amazonlinux:latest /bin/bash`
@@ -36,7 +36,22 @@ we are trying to use EC2 images so that we can start working on getting these im
 1. At this point in time we can clearly see that though everything is set correctly we still cannot access the  
  
 
+## DOCKER BASICS: VOLUME MOUNTING
+* `docker run --rm -v /tmp:/tmp amazonlinux /bin/bash -c "ls -las > /tmp/testoutput.txt" --rm`
+    * __-v__ mount volume in your host to volume in your guest
+    * __-rm__ this starts a container from an image and then removes the container after the command execution is over
+* entering the option `--rm` at the end does not work `docker run -v /tmp:/tmp amazonlinux /bin/bash -c "ls -las > /tmp/testoutput.txt" --rm`    
+
+# LEARNING PATH
+* docker, dockerfile, docker compose: https://learning.oreilly.com/videos/docker-dockerfile-and/9781800206847
+* try to see the video for Getting Started with Kubernetes LiveLessons, 2nd Edition by Sander available in Oreilly
+* there is another course on Coursera for AWS: https://www.coursera.org/learn/containerized-apps-on-aws/
+* there is another course for GCS: https://www.coursera.org/learn/google-kubernetes-engine
+* and then the architecture patterns for GCS: https://www.coursera.org/specializations/architecting-google-kubernetes-engine
+* Kubernetes up and running - https://learning.oreilly.com/library/view/kubernetes-up-and/9781492046523/
+
 
 # REFERENCE
 * https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started-fargate.html
+* 
  
