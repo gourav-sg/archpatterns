@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+  phpapp:
+    ports:
+      - "8080:80"
+    build:
+      context: ..
+      dockerfile: test1.dockerfile
+  phpapp_two:
+    ports:
+      - "8081:80"
+    build:
+      context: ..
+      dockerfile: test1.dockerfile
+  phpapp_three:
+    image: php:7.2-apache
+    ports:
+      - "8082:80"
+    volumes:
+      - "./:/var/www/html"
+    container_name: gouravpp-in-php
+  phpapp_four:
+    ports:
+      - "8083:80"
+    build:
+      context: ..
+      dockerfile: test2.dockerfile
+    image: gouravapp:123
+    volumes:
+    - "./:/var/www/html"
+    container_name: gouravapp-in-php-two
+
+  db_test:
+    image: library/mysql:5.7.31
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    container_name: gouravdb
+
+  db_persistent:
+    image: library/mysql:5.7.31
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: somedatabase
+    volumes:
+      - /tmp/data:/var/lib/mysql
+    container_name: gouravdb_persistent
+
+  dbclient:
+    image: library/mysql:5.7.31
+    depends_on:
+      - db_persistent
+    command: mysql -uroot -proot -hdb_persistent
+
+
+  neo4j:
+    container_name: neo4jdb
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    build:
+      context: ..
+      dockerfile: ../neo4j/neo4j.dockerfile
+    volumes:
+      - /Users/senguptag/Development/neo4j:/mnt/neo4j

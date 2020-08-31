@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  neo4j:
+    container_name: neo4jdb
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    build:
+      context: ./
+      dockerfile: neo4j.dockerfile
+    volumes:
+      - /Users/senguptag/Development/neo4j:/mnt/neo4j
+    command: bash -c "
+        JAVA_HOME=/mnt/neo4j/java/amazon-corretto-11.0.8.10.1-linux-x64/ /mnt/neo4j/neo4j/bin/neo4j console
+      "
+
+
+  neo4j_python:
+    image: ubuntu:latest
+    container_name: neo4j_python
+    volumes:
+      - /Users/senguptag/Development/neo4j:/mnt/neo4j
+    depends_on:
+      - neo4j
